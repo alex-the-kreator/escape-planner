@@ -80,3 +80,5 @@ Incluye:
 - No se implementó lógica de negocio.
 - No se implementó seguridad funcional.
 - No se construyeron vistas completas del sistema.
+
+Configuración inicial del entorno y conexión a base de datos completada.
