@@ -29,7 +29,7 @@ import java.util.List;
 
 /**
  * Entidad central del sistema.
- * Desde aquí se relacionan los datos principales del evento y su seguimiento.
+ * Desde aquí se relacionan los datos principales del evento y su seguimiento
  *
  * @author Alex Mártin
  */

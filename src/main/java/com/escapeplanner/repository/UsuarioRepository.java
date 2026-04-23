@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 /**
- * Repositorio de acceso a usuarios.
+ * Repositorio de acceso a usuarios
  * El método por email queda preparado pensando en la futura autenticación
  *
  * @author Alex Mártin

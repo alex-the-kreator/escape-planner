@@ -22,8 +22,7 @@ public interface EventoRepository extends JpaRepository<Evento, Long> {
 
     // Detecta cruces de horario el mismo dia. La condición horaInicio < horaFinNueva y horaFin > horaInicioNueva
     // es la forma clásica de verificar solapamiento entre rangos
-    // TODO: mas adelante se podría complementar con reglas adicionales
-    // según tipo de evento o capacidad operativa real de la sede
+    // TODO: mas adelante se podría complementar con reglas adicionales según tipo de evento o capacidad operativa real de la sede
     @Query("""
             select count(e) > 0
             from Evento e
