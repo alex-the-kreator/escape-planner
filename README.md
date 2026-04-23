@@ -63,7 +63,7 @@ Incluye:
 - Relaciones foraneas basicas entre usuarios, clientes y eventos.
 - Insercion semilla de dos usuarios con roles `ASESOR` y `ADMINISTRADOR`.
 
-## Orden de ejecucion
+## Orden de ejecución
 
 1. Crear la base de datos PostgreSQL llamada `escape_planner`.
 2. Ejecutar el script `database/01_escape_planner_fase1.sql`.
@@ -71,12 +71,12 @@ Incluye:
 4. Abrir el proyecto como proyecto Maven y resolver dependencias.
 5. Ejecutar la clase `com.escapeplanner.EscapePlannerApplication`.
 
-## Checklist de validacion
+## Checklist de validación
 
-- El proyecto abre como aplicacion Spring Boot sin errores de estructura.
-- `application.properties` apunta a PostgreSQL y `ddl-auto` esta en `none`.
+- El proyecto abre como aplicación Spring Boot sin errores de estructura.
+- `application.properties` apunta a PostgreSQL y `ddl-auto` está en `none`.
 - El script SQL crea las 7 tablas solicitadas.
 - Existen los usuarios semilla con roles `ASESOR` y `ADMINISTRADOR`.
-- No se implemento logica de negocio.
-- No se implemento seguridad funcional.
+- No se implementó lógica de negocio.
+- No se implementó seguridad funcional.
 - No se construyeron vistas completas del sistema.
