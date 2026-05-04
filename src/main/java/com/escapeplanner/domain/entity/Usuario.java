@@ -56,8 +56,7 @@ public class Usuario {
     @Column(nullable = false, length = 30)
     private RolUsuario rol;
 
-    // El estado se tipa como enum para evitar valores libres y
-    // mantener consistencia con lo definido en la documentación.
+    // El estado se tipa como enum para evitar valores libres y mantener consistencia con lo definido en la documentación.
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)

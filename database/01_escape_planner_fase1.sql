@@ -83,4 +83,4 @@ INSERT INTO usuarios (nombre, email, password, rol, estado)
 VALUES
     ('Usuario Asesor Semilla', 'asesor@escapeplanner.local', '$2a$10$pendiente.definir.hash.segura.asesor', 'ASESOR', 'ACTIVO'),
     ('Usuario Administrador Semilla', 'admin@escapeplanner.local', '$2a$10$pendiente.definir.hash.segura.admin', 'ADMINISTRADOR', 'ACTIVO')
-ON CONFLICT (email) DO NOTHING;
+ON CONFLICT (email) DO NOTHING; //Si ya existe un usuario con ese email no se vuelve a insertar

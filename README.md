@@ -1,7 +1,7 @@
 # Escape Planner - Fase 1
 
 ## Estructura del proyecto
-
+Autor: Alex Mártin
 ```text
 escape-planner/
 ├── database/
