@@ -7,7 +7,6 @@ import com.escapeplanner.repository.ClienteRepository; // Repositorio para acces
 import com.escapeplanner.service.ClienteService; // Interfaz del servicio
 import org.springframework.stereotype.Service; // Marca la clase como servicio de Spring
 import org.springframework.transaction.annotation.Transactional; // Manejo de transacciones
-
 import java.util.List; // Para manejar listas de clientes
 import java.util.Optional; // Para manejar posibles valores nulos de forma segura
 

@@ -1,14 +1,8 @@
 package com.escapeplanner.domain.entity;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import com.escapeplanner.domain.enums.EstadoCliente;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -49,10 +43,11 @@ public class Cliente {
     @Column(name = "canal_contacto", length = 50)
     private String canalContacto;
 
-    @Size(max = 20)
-    @Column(length = 20)
-    private String estado;
-
+    //AQUÍ ESTÁ EL CAMBIO IMPORTANTE
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private EstadoCliente estado;
+ @JsonIgnore
     @OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Evento> eventos = new ArrayList<>();
 
@@ -61,10 +56,6 @@ public class Cliente {
 
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getNombre() {
@@ -99,11 +90,12 @@ public class Cliente {
         this.canalContacto = canalContacto;
     }
 
-    public String getEstado() {
+    // GETTER Y SETTER ACTUALIZADOS
+    public EstadoCliente getEstado() {
         return estado;
     }
 
-    public void setEstado(String estado) {
+    public void setEstado(EstadoCliente estado) {
         this.estado = estado;
     }
 
