@@ -1,5 +1,6 @@
 package com.escapeplanner.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.escapeplanner.domain.enums.EstadoEvento;
 import com.escapeplanner.domain.enums.TipoEvento;
 import jakarta.persistence.CascadeType;
@@ -42,11 +43,13 @@ public class Evento {
     private Long id;
 
     // Todo evento debe pertenecer a un cliente existente según las reglas de integridad referencial del proyecto.
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
 
     // El usuario representa al asesor o responsable que gestiona el evento dentro del sistema
+    @JsonIgnore
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "usuario_id", nullable = false)
@@ -70,7 +73,7 @@ public class Evento {
     @Column(name = "hora_fin", nullable = false)
     private LocalTime horaFin;
 
-    // La cantidad de personas no debe ser cero ni negativa.
+    // La cantidad de personas no debe ser cero ni negativa
     @NotNull
     @Positive
     @Column(name = "num_personas", nullable = false)
@@ -98,15 +101,16 @@ public class Evento {
     private LocalDateTime fechaActualizacion;
 
     // Desde el detalle del evento se administran tareas, pagos, documentos y bloqueos. Por eso estas relaciones cuelgan de aquí
+    @JsonIgnore
     @OneToMany(mappedBy = "evento", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<TareaEvento> tareas = new ArrayList<>();
-
+    @JsonIgnore
     @OneToMany(mappedBy = "evento", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Pago> pagos = new ArrayList<>();
-
+    @JsonIgnore
     @OneToMany(mappedBy = "evento", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Documento> documentos = new ArrayList<>();
-
+    @JsonIgnore
     @OneToMany(mappedBy = "evento", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Bloqueo> bloqueos = new ArrayList<>();
 
@@ -127,8 +131,7 @@ public class Evento {
 
     @PreUpdate
     public void preUpdate() {
-        // TODO: si en una siguiente fase se requiere auditoria mas completa,
-        // aquí se podría registrar también el usuario que hizo la modificación.
+        // TODO: si en una siguiente fase se requiere auditoria mas completa, aquí se podría registrar también el usuario que hizo la modificación
         fechaActualizacion = LocalDateTime.now();
     }
 

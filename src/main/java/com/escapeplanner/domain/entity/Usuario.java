@@ -2,6 +2,7 @@ package com.escapeplanner.domain.entity;
 
 import com.escapeplanner.domain.enums.EstadoUsuario;
 import com.escapeplanner.domain.enums.RolUsuario;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -25,7 +26,7 @@ import java.util.List;
  * Representa a los usuarios internos que pueden ingresar al sistema.
  * En esta primera etapa se contemplan los roles ASESOR y ADMINISTRADOR.
  *
- * @author Alex Mártin
+ * @author Alex M\u00E1rtin
  */
 @Entity
 @Table(name = "usuarios")
@@ -46,6 +47,7 @@ public class Usuario {
     @Column(nullable = false, unique = true, length = 120)
     private String email;
 
+    @JsonIgnore
     @NotBlank
     @Size(max = 255)
     @Column(nullable = false, length = 255)
@@ -56,13 +58,14 @@ public class Usuario {
     @Column(nullable = false, length = 30)
     private RolUsuario rol;
 
-    // El estado se tipa como enum para evitar valores libres y mantener consistencia con lo definido en la documentación.
+    // El estado se tipa como enum para evitar valores libres y mantener consistencia con lo definido en la documentacion.
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private EstadoUsuario estado;
 
-    // Relación inversa con eventos. Se deja lazy porque un usuario no siempre necesita cargar todo su historial al consultarlo
+    // Esta relacion inversa no aporta en la respuesta del evento y ademas puede generar serializacion circular.
+    @JsonIgnore
     @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Evento> eventos = new ArrayList<>();
 

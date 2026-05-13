@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<!--
+    Vista principal del módulo de clientes.
+    Aquí se muestra el listado completo de clientes registrados.
+-->
+
+<head th:replace="~{fragments/layout :: head('Clientes')}"></head>
+
+<body class="app-page">
+
+<!-- Barra de navegación reutilizable -->
+<nav th:replace="~{fragments/layout :: navbar('clientes')}"></nav>
+
+<main class="container py-5">
+
+    <!-- Encabezado principal de la página -->
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
+
+        <div>
+
+            <!-- Texto superior decorativo -->
+            <p class="section-kicker">Módulo web</p>
+
+            <!-- Título principal -->
+            <h1 class="h2 mb-1">Clientes</h1>
+
+            <!-- Descripción breve -->
+            <p class="text-muted mb-0">
+                Listado general de clientes registrados en Escape Planner.
+            </p>
+
+        </div>
+
+        <!-- Botón para registrar un nuevo cliente -->
+        <a class="btn btn-primary"
+           th:href="@{/clientes/nuevo}">
+
+            Nuevo cliente
+
+        </a>
+
+    </div>
+
+    <!--
+        Mensaje de éxito mostrado cuando una acción
+        se realiza correctamente.
+    -->
+    <div th:if="${successMessage}"
+         class="alert alert-success"
+         th:text="${successMessage}">
+    </div>
+
+    <!-- Card principal que contiene la tabla -->
+    <div class="card border-0 shadow-sm">
+
+        <!-- Hace que la tabla sea responsive -->
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle mb-0">
+
+                <!-- Encabezado de la tabla -->
+                <thead class="table-light">
+
+                <tr>
+
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Teléfono</th>
+                    <th>Email</th>
+                    <th>Canal de contacto</th>
+                    <th>Estado</th>
+
+                </tr>
+
+                </thead>
+
+                <tbody>
+
+                <!--
+                    Este registro aparece cuando la lista de clientes está vacía.
+                -->
+                <tr th:if="${#lists.isEmpty(clientes)}">
+
+                    <td colspan="6"
+                        class="text-center text-muted py-4">
+
+                        Aún no hay clientes registrados.
+
+                    </td>
+
+                </tr>
+
+                <!--
+                    Thymeleaf recorre dinámicamente todos los clientes.
+                -->
+                <tr th:each="cliente : ${clientes}">
+
+                    <!-- ID del cliente -->
+                    <td th:text="${cliente.id}"></td>
+
+                    <!-- Nombre completo -->
+                    <td th:text="${cliente.nombre}"></td>
+
+                    <!-- Número telefónico -->
+                    <td th:text="${cliente.telefono}"></td>
+
+                    <!-- Correo electrónico -->
+                    <td th:text="${cliente.email}"></td>
+
+                    <!-- Canal principal de contacto -->
+                    <td th:text="${cliente.canalContacto}"></td>
+
+                    <!-- Estado del cliente -->
+                    <td>
+
+                        <!--
+                            Si el cliente está ACTIVO,
+                            se muestra una etiqueta verde.
+                        -->
+                        <span class="badge rounded-pill text-bg-success"
+                              th:if="${cliente.estado.name() == 'ACTIVO'}"
+                              th:text="${cliente.estado}">
+                        </span>
+
+                        <!--
+                            Si el cliente está INACTIVO,
+                            se muestra una etiqueta gris.
+                        -->
+                        <span class="badge rounded-pill text-bg-secondary"
+                              th:if="${cliente.estado.name() == 'INACTIVO'}"
+                              th:text="${cliente.estado}">
+                        </span>
+
+                    </td>
+
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</main>
+
+</body>
+</html>

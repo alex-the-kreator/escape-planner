@@ -1,31 +1,18 @@
 package com.escapeplanner.service.impl;
 
-// Entidades principales utilizadas por el servicio
-// Cliente y Usuario son necesarios porque cada evento debe quedar asociado a ambos
-import com.escapeplanner.domain.entity.Cliente;
-import com.escapeplanner.domain.entity.Evento;
+
+import com.escapeplanner.domain.entity.Cliente;// Entidades principales utilizadas por el servicio
+import com.escapeplanner.domain.entity.Evento;// Cliente y Usuario son necesarios porque cada evento debe quedar asociado a ambos
 import com.escapeplanner.domain.entity.Usuario;
-
-// Enum que define los posibles estados del evento, como CONFIRMADO o CANCELADO
-import com.escapeplanner.domain.enums.EstadoEvento;
-
-// DTO que recibe los datos necesarios para registrar o actualizar un evento
-import com.escapeplanner.dto.EventoRequest;
-
-// Excepciones personalizadas utilizadas para controlar errores de negocio y recursos no encontrados
-import com.escapeplanner.exception.BusinessException;
+import com.escapeplanner.domain.enums.EstadoEvento;// Enum que define los posibles estados del evento, como CONFIRMADO o CANCELADO
+import com.escapeplanner.dto.EventoRequest;// DTO que recibe los datos necesarios para registrar o actualizar un evento
+import com.escapeplanner.exception.BusinessException;// Excepciones personalizadas utilizadas para controlar errores de negocio y recursos no encontrados
 import com.escapeplanner.exception.ResourceNotFoundException;
-
-// Repositorios encargados del acceso a datos de cada entidad
-import com.escapeplanner.repository.ClienteRepository;
+import com.escapeplanner.repository.ClienteRepository;// Repositorios encargados del acceso a datos de cada entidad
 import com.escapeplanner.repository.EventoRepository;
 import com.escapeplanner.repository.UsuarioRepository;
-
-// Interfaz que esta clase implementa
-import com.escapeplanner.service.EventoService;
-
-// Anotaciones de Spring para declarar el servicio y controlar transacciones
-import org.springframework.stereotype.Service;
+import com.escapeplanner.service.EventoService;// Interfaz que esta clase implementa
+import org.springframework.stereotype.Service;// Anotaciones de Spring para declarar el servicio y controlar transacciones
 import org.springframework.transaction.annotation.Transactional;
 
 // Clases para el manejo de fechas, horas, listas y valores opcionales
@@ -35,13 +22,13 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Implementación de la capa de servicio para el módulo de eventos.
+ * Implementación de la capa de servicio para el módulo de eventos
  *
  * En esta clase se centraliza la lógica principal relacionada con los eventos,
- * como el registro, actualización, consulta y validación de conflictos de horario.
+ * como el registro, actualización, consulta y validación de conflictos de horario
  *
  * También se valida que el cliente y el usuario asociados al evento existan
- * antes de guardar o actualizar la información.
+ * antes de guardar o actualizar la información
  *
  * @author Alex Mártin
  */
@@ -54,11 +41,11 @@ public class EventoServiceImpl implements EventoService {
     private final UsuarioRepository usuarioRepository; //Repositorio utilizado para consultar usuarios existentes, esto permite asignarcorrectamente el responsable o usuario relacionado al evento.
 
     /**
-     * Constructor de la clase.
+     * Constructor de la clase
      *
      * Se utiliza inyección de dependencias por constructor, ya que es una buena práctica
      * en Spring Boot. De sta forma, Spring entrega automáticamente los repositorios
-     * necesarios para que el servicio pueda funcionar.
+     * necesarios para que el servicio pueda funcionar
      */
     public EventoServiceImpl(
             EventoRepository eventoRepository,
@@ -71,12 +58,12 @@ public class EventoServiceImpl implements EventoService {
     }
 
     /**
-     * Registra un nuevo evento en el sistema.
+     * Registra un nuevo evento en el sistema
      *
-     * Primero se valida que el cliente y el usuario existan.
-     * Luego se revisa si el event confirmado genera conflicto de horario.
+     * Primero se valida que el cliente y el usuario existan
+     * Luego se revisa si el event confirmado genera conflicto de horario
      * Finalmente, se mapean los datos del request hacia la entidad Evento
-     * y se guarda en la base de datos.
+     * y se guarda en la base de datos
      */
     @Override
     public Evento registrar(EventoRequest request) {
@@ -98,14 +85,14 @@ public class EventoServiceImpl implements EventoService {
     }
 
     /**
-     * Actualiza un evento existente.
+     * Actualiza un evento existente
      *
      * Primero se valida que el evento exista.
-     * Después se validan nuevamente el cliente y el usuario asociados.
-     * También se revisa ue no exista conflicto de horario si el evento queda confirmado.
+     * Después se validan nuevamente el cliente y el usuario asociados
+     * También se revisa ue no exista conflicto de horario si el evento queda confirmado
      *
      * En este caso se envía el ID del evento actual para excluirlo de la comparación,
-     * evitando que el sistema lo tome como conflicto consigo mismo.
+     * evitando que el sistema lo tome como conflicto consigo mismo
      */
     @Override
     public Evento actualizar(Long eventoId, EventoRequest request) {
@@ -127,10 +114,10 @@ public class EventoServiceImpl implements EventoService {
     }
 
     /**
-     * Lista todos los eventos registrados.
+     * Lista todos los eventos registrados
      *
      * Se utiliza una consulta personalizada del repositorio para ordenarlos
-     * por fecha ascendente y hora e inicio ascendente.
+     * por fecha ascendente y hora e inicio ascendente
      */
     @Override
     @Transactional(readOnly = true)
@@ -139,10 +126,10 @@ public class EventoServiceImpl implements EventoService {
     }
 
     /**
-     * Busca un evento por su ID.
+     * Busca un evento por su ID
      *
      * Se retorna Optional porque puede existir la posibilidad de que
-     * no se encuentre ningún evento con el ID recibido.
+     * no se encuentre ningún evento con el ID recibido
      */
     @Override
     @Transactional(readOnly = true)
@@ -153,9 +140,9 @@ public class EventoServiceImpl implements EventoService {
     /**
      * Verifica si existe un conflicto de horario para una fecha y rango de horas.
      *
-     * Esta validación se apoya en el repositorio de eventos.
+     * Esta validación se apoya en el repositorio de eventos
      * Además, se excluyen los eventoscancelados porque estos no deben bloquear
-     * la programación de nuevos eventos.
+     * la programación de nuevos eventos
      */
     @Override
     @Transactional(readOnly = true)
@@ -165,11 +152,13 @@ public class EventoServiceImpl implements EventoService {
             LocalTime horaFin,
             Long eventoIdExcluir
     ) {
+        Long idExcluirSeguro = eventoIdExcluir != null ? eventoIdExcluir : -1L;
+
         return eventoRepository.existsConflictoHorario(
                 fecha,
                 horaInicio,
                 horaFin,
-                eventoIdExcluir,
+                idExcluirSeguro,
                 EstadoEvento.CANCELADO
         );
     }
@@ -178,7 +167,7 @@ public class EventoServiceImpl implements EventoService {
      * Obtiene un evento existente por ID.
      *
      * Este método e usa internamente cuando el evento debe existir obligatoriamente,
-     * por ejemplo, al actualizarlo. Si no existe, se lanza una excepción controlada.
+     * por ejemplo, al actualizarlo. Si no existe, se lanza una excepción controlada
      */
     private Evento obtenerEventoExistente(Long eventoId) {
         return eventoRepository.findById(eventoId)
@@ -191,7 +180,7 @@ public class EventoServiceImpl implements EventoService {
      * Obtiene un cliente existente por ID.
      *
      * Esta validación garantiza que no se registre un evento asociado
-     * a un cliente inexstente.
+     * a un cliente inexstente
      */
     private Cliente obtenerClienteExistente(Long clienteId) {
         return clienteRepository.findById(clienteId)

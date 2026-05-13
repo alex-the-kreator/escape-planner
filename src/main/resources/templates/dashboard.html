@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<!--
+    Página principal del sistema (Dashboard).
+    Desde aquí el usuario puede acceder rápidamente
+    a los módulos principales de la aplicación.
+-->
+
+<head th:replace="~{fragments/layout :: head('Dashboard')}"></head>
+
+<body class="app-page">
+
+<!-- Barra de navegación reutilizable -->
+<nav th:replace="~{fragments/layout :: navbar('dashboard')}"></nav>
+
+<main class="container py-5">
+
+    <!--
+        Mensaje de éxito dinámico.
+        Se muestra cuando alguna acción se ejecuta correctamente.
+    -->
+    <div th:if="${successMessage}"
+         class="alert alert-success"
+         th:text="${successMessage}">
+    </div>
+
+    <!-- Sección principal de bienvenida -->
+    <section class="hero-panel mb-5">
+
+        <div>
+
+            <!-- Nombre de la empresa -->
+            <p class="section-kicker">Escape Room Colombia</p>
+
+            <!-- Título principal -->
+            <h1 class="display-6 fw-bold mb-3">
+                Escape Planner
+            </h1>
+
+            <!-- Descripción breve del sistema -->
+            <p class="lead text-muted mb-0">
+                Sistema de registro de eventos
+            </p>
+
+        </div>
+
+        <!-- Logo principal del sistema -->
+        <img th:src="@{/img/logo.png}"
+             alt="Logo Escape Planner"
+             class="hero-logo">
+
+    </section>
+
+    <!-- Contenedor principal de tarjetas -->
+    <div class="row g-4">
+
+        <!-- Tarjeta del módulo de clientes -->
+        <div class="col-md-4">
+
+            <div class="card dashboard-card h-100 border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <!-- Título de la tarjeta -->
+                    <h2 class="h4">Clientes</h2>
+
+                    <!-- Descripción -->
+                    <p class="text-muted">
+                        Consulta el listado y registra nuevos clientes.
+                    </p>
+
+                    <!-- Botón para acceder al módulo -->
+                    <a class="btn btn-outline-primary"
+                       th:href="@{/clientes}">
+
+                        Ir a clientes
+
+                    </a>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Tarjeta del módulo de eventos -->
+        <div class="col-md-4">
+
+            <div class="card dashboard-card h-100 border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <!-- Título -->
+                    <h2 class="h4">Eventos</h2>
+
+                    <!-- Descripción -->
+                    <p class="text-muted">
+                        Registra eventos y valida conflictos horarios antes de confirmar.
+                    </p>
+
+                    <!-- Botón de acceso -->
+                    <a class="btn btn-outline-primary"
+                       th:href="@{/eventos}">
+
+                        Ir a eventos
+
+                    </a>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Tarjeta informativa de la API REST -->
+        <div class="col-md-4">
+
+            <div class="card dashboard-card h-100 border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <!-- Título -->
+                    <h2 class="h4">API REST activa</h2>
+
+                    <!-- Descripción -->
+                    <p class="text-muted">
+                        Los endpoints REST siguen disponibles para pruebas en Postman.
+                    </p>
+
+                    <!-- Contenedor de botones -->
+                    <div class="d-flex flex-column gap-2">
+
+                        <!-- Endpoint de clientes -->
+                        <a class="btn btn-outline-dark"
+                           href="/api/clientes"
+                           target="_blank">
+
+                            /api/clientes
+
+                        </a>
+
+                        <!-- Endpoint de eventos -->
+                        <a class="btn btn-outline-dark"
+                           href="/api/eventos"
+                           target="_blank">
+
+                            /api/eventos
+
+                        </a>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</main>
+
+</body>
+</html>

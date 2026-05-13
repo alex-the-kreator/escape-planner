@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Login')}"></head>
+<body class="login-page">
+<div class="creator-badge">by: Alex-the-kreator</div>
+
+<div class="login-shell">
+    <div class="login-card card shadow-lg border-0">
+        <div class="card-body p-5 login-card-body">
+            <div class="text-center mb-4">
+                <img th:src="@{/img/logo.png}" alt="Escape Planner" class="login-logo login-logo-rounded">
+                <h1 class="login-title mt-4 mb-2">Escape Planner</h1>
+                <p class="login-subtitle mb-0">Sistema de gesti&oacute;n de eventos</p>
+            </div>
+
+            <form th:action="@{/login}" method="post" class="mt-4 login-form">
+                <div class="mb-3">
+                    <label for="correo" class="form-label">Correo</label>
+                    <input type="email" class="form-control form-control-lg" id="correo" name="correo" placeholder="asesor@escapeplanner.local" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Contrase&ntilde;a</label>
+                    <input type="password" class="form-control form-control-lg" id="password" name="password" placeholder="Ingresa tu contrase&ntilde;a" required>
+                </div>
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg login-submit">Iniciar sesi&oacute;n</button>
+                </div>
+            </form>
+
+            <div class="login-note mt-4 mb-0 text-center small">
+                Acceso visual temporal para demostraci&oacute;n acad&eacute;mica. La autenticaci&oacute;n real se integrar&aacute; en una fase posterior.
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
