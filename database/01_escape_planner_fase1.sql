@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS usuarios (
+﻿CREATE TABLE IF NOT EXISTS usuarios (
     id BIGSERIAL PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     email VARCHAR(120) NOT NULL UNIQUE,
@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
 
 CREATE TABLE IF NOT EXISTS clientes (
     id BIGSERIAL PRIMARY KEY,
+    cedula VARCHAR(20) NOT NULL UNIQUE,
     nombre VARCHAR(150) NOT NULL,
     telefono VARCHAR(30) NOT NULL,
     email VARCHAR(120),
@@ -83,4 +84,4 @@ INSERT INTO usuarios (nombre, email, password, rol, estado)
 VALUES
     ('Usuario Asesor Semilla', 'asesor@escapeplanner.local', '$2a$10$pendiente.definir.hash.segura.asesor', 'ASESOR', 'ACTIVO'),
     ('Usuario Administrador Semilla', 'admin@escapeplanner.local', '$2a$10$pendiente.definir.hash.segura.admin', 'ADMINISTRADOR', 'ACTIVO')
-ON CONFLICT (email) DO NOTHING; //Si ya existe un usuario con ese email no se vuelve a insertar
+ON CONFLICT (email) DO NOTHING;

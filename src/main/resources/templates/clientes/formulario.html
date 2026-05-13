@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Nuevo Cliente')}"></head>
 <body class="app-page">
@@ -19,6 +19,11 @@
                 <div class="card-body p-4 p-lg-5">
                     <form th:action="@{/clientes/guardar}" th:object="${clienteRequest}" method="post" novalidate>
                         <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="cedula" class="form-label">Cedula</label>
+                                <input type="text" id="cedula" class="form-control" th:field="*{cedula}">
+                                <div class="text-danger small mt-1" th:if="${#fields.hasErrors('cedula')}" th:errors="*{cedula}"></div>
+                            </div>
                             <div class="col-md-6">
                                 <label for="nombre" class="form-label">Nombre</label>
                                 <input type="text" id="nombre" class="form-control" th:field="*{nombre}">

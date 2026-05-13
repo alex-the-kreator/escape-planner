@@ -4,78 +4,51 @@
 <head th:replace="~{fragments/layout :: head('Nuevo Evento')}"></head>
 
 <body class="app-page">
-
-<!-- Barra de navegación principal del sistema -->
 <nav th:replace="~{fragments/layout :: navbar('eventos')}"></nav>
 
 <main class="container py-5">
-
-    <!-- Contenedor principal del formulario -->
     <div class="row justify-content-center">
         <div class="col-xl-10">
-
-            <!-- Encabezado de la página -->
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
-                    <p class="section-kicker">Módulo web</p>
+                    <p class="section-kicker">Modulo web</p>
                     <h1 class="h2 mb-1">Registrar evento</h1>
                     <p class="text-muted mb-0">
-                        Formulario temporal conectado a la misma lógica de negocio de la API REST.
+                        Formulario temporal conectado a la misma logica de negocio de la API REST.
                     </p>
                 </div>
-
-                <!-- Botón para regresar al listado de eventos -->
                 <a class="btn btn-outline-secondary" th:href="@{/eventos}">Volver</a>
             </div>
 
-            <!-- Mensaje de error general, solo aparece si existe errorMessage -->
             <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
 
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-4 p-lg-5">
-
-                    <!-- Formulario para registrar un nuevo evento -->
                     <form th:action="@{/eventos/guardar}" th:object="${eventoRequest}" method="post" novalidate>
-
                         <div class="row g-3">
-
-                            <!-- Campo para buscar y seleccionar el cliente -->
                             <div class="col-md-6">
                                 <label for="clienteBusqueda" class="form-label">Cliente</label>
-
-                                <!-- Este input oculto guarda el ID real del cliente seleccionado -->
                                 <input type="hidden" id="clienteId" th:field="*{clienteId}">
-
-                                <!-- Campo visible para buscar el cliente -->
                                 <input
                                         type="text"
                                         id="clienteBusqueda"
                                         class="form-control"
-                                        placeholder="Buscar por ID, nombre, teléfono, email o canal"
+                                        placeholder="Buscar por cedula, nombre, telefono, email o canal"
                                         autocomplete="off"
                                 >
-
                                 <div class="form-text">
-                                    La búsqueda actual funciona con ID, nombre, teléfono, email y canal de contacto.
+                                    La busqueda actual funciona con cedula, nombre, telefono, email y canal de contacto.
                                 </div>
-
-                                <!-- Aquí se muestra el cliente seleccionado -->
                                 <div id="clienteSeleccionado" class="selected-client-box mt-2 d-none"></div>
-
-                                <!-- Aquí se muestran los resultados de la búsqueda -->
                                 <div id="clienteResultados" class="client-search-results mt-2"></div>
-
-                                <!-- Mensaje de validación del campo cliente -->
                                 <div class="text-danger small mt-1"
                                      th:if="${#fields.hasErrors('clienteId')}"
                                      th:errors="*{clienteId}">
                                 </div>
                             </div>
 
-                            <!-- Campo para seleccionar el asesor responsable -->
                             <div class="col-md-6">
                                 <label for="usuarioId" class="form-label">Asesor responsable</label>
-
                                 <select id="usuarioId" class="form-select" th:field="*{usuarioId}">
                                     <option value="">Selecciona un usuario</option>
                                     <option th:each="usuario : ${usuarios}"
@@ -83,124 +56,95 @@
                                             th:text="${usuario.nombre + ' - ' + usuario.rol}">
                                     </option>
                                 </select>
-
                                 <div class="text-danger small mt-1"
                                      th:if="${#fields.hasErrors('usuarioId')}"
                                      th:errors="*{usuarioId}">
                                 </div>
                             </div>
 
-                            <!-- Campo para seleccionar el tipo de evento -->
                             <div class="col-md-4">
                                 <label for="tipo" class="form-label">Tipo de evento</label>
-
                                 <select id="tipo" class="form-select" th:field="*{tipo}">
                                     <option th:each="tipo : ${tiposEvento}"
                                             th:value="${tipo}"
                                             th:text="${tipo}">
                                     </option>
                                 </select>
-
                                 <div class="text-danger small mt-1"
                                      th:if="${#fields.hasErrors('tipo')}"
                                      th:errors="*{tipo}">
                                 </div>
                             </div>
 
-                            <!-- Campo para seleccionar la fecha del evento -->
                             <div class="col-md-4">
                                 <label for="fecha" class="form-label">Fecha</label>
-
                                 <input type="date" id="fecha" class="form-control" th:field="*{fecha}">
-
                                 <div class="text-danger small mt-1"
                                      th:if="${#fields.hasErrors('fecha')}"
                                      th:errors="*{fecha}">
                                 </div>
                             </div>
 
-                            <!-- Campo para ingresar el número de personas -->
                             <div class="col-md-4">
-                                <label for="numPersonas" class="form-label">Número de personas</label>
-
-                                <input type="number"
-                                       id="numPersonas"
-                                       class="form-control"
-                                       min="1"
-                                       th:field="*{numPersonas}">
-
+                                <label for="numPersonas" class="form-label">Numero de personas</label>
+                                <input type="number" id="numPersonas" class="form-control" min="1" th:field="*{numPersonas}">
                                 <div class="text-danger small mt-1"
                                      th:if="${#fields.hasErrors('numPersonas')}"
                                      th:errors="*{numPersonas}">
                                 </div>
                             </div>
 
-                            <!-- Campo para la hora de inicio -->
                             <div class="col-md-4">
                                 <label for="horaInicio" class="form-label">Hora de inicio</label>
-
                                 <input type="time" id="horaInicio" class="form-control" th:field="*{horaInicio}">
-
                                 <div class="text-danger small mt-1"
                                      th:if="${#fields.hasErrors('horaInicio')}"
                                      th:errors="*{horaInicio}">
                                 </div>
                             </div>
 
-                            <!-- Campo para la hora de finalización -->
                             <div class="col-md-4">
-                                <label for="horaFin" class="form-label">Hora de finalización</label>
-
+                                <label for="horaFin" class="form-label">Hora de finalizacion</label>
                                 <input type="time" id="horaFin" class="form-control" th:field="*{horaFin}">
-
                                 <div class="text-danger small mt-1"
                                      th:if="${#fields.hasErrors('horaFin')}"
                                      th:errors="*{horaFin}">
                                 </div>
                             </div>
 
-                            <!-- Campo para seleccionar el estado del evento -->
                             <div class="col-md-4">
                                 <label for="estado" class="form-label">Estado</label>
-
                                 <select id="estado" class="form-select" th:field="*{estado}">
                                     <option th:each="estado : ${estadosEvento}"
                                             th:value="${estado}"
                                             th:text="${estado}">
                                     </option>
                                 </select>
-
                                 <div class="text-danger small mt-1"
                                      th:if="${#fields.hasErrors('estado')}"
                                      th:errors="*{estado}">
                                 </div>
                             </div>
 
-                            <!-- Campo para indicar si el evento requiere bloqueo -->
                             <div class="col-md-4">
                                 <label for="requiereBloqueo" class="form-label">Requiere bloqueo</label>
-
                                 <select id="requiereBloqueo" class="form-select" th:field="*{requiereBloqueo}">
-                                    <option th:value="true">Sí</option>
+                                    <option th:value="true">Si</option>
                                     <option th:value="false">No</option>
                                 </select>
-
                                 <div class="text-danger small mt-1"
                                      th:if="${#fields.hasErrors('requiereBloqueo')}"
                                      th:errors="*{requiereBloqueo}">
                                 </div>
                             </div>
 
-                            <!-- Campo para escribir los detalles logísticos -->
                             <div class="col-12">
-                                <label for="detallesLogisticos" class="form-label">Detalles logísticos</label>
-
+                                <label for="detallesLogisticos" class="form-label">Detalles logisticos</label>
                                 <textarea id="detallesLogisticos"
                                           class="form-control"
                                           rows="4"
                                           th:field="*{detallesLogisticos}">
                                 </textarea>
-
                                 <div class="text-danger small mt-1"
                                      th:if="${#fields.hasErrors('detallesLogisticos')}"
                                      th:errors="*{detallesLogisticos}">
@@ -208,12 +152,10 @@
                             </div>
                         </div>
 
-                        <!-- Botones finales del formulario -->
                         <div class="d-flex justify-content-end gap-2 mt-4">
                             <a class="btn btn-outline-secondary" th:href="@{/eventos}">Cancelar</a>
                             <button type="submit" class="btn btn-primary">Guardar evento</button>
                         </div>
-
                     </form>
                 </div>
             </div>
@@ -222,12 +164,11 @@
 </main>
 
 <script th:inline="javascript">
-
-    // Lista de clientes enviada desde el backend usando Thymeleaf
     const clientesDisponibles = [
         /*[# th:each="cliente, clienteStat : ${clientes}"]*/
         {
             id: [[${cliente.id}]],
+            cedula: [[${cliente.cedula}]],
             nombre: [[${cliente.nombre}]],
             telefono: [[${cliente.telefono}]],
             email: [[${cliente.email}]],
@@ -236,16 +177,14 @@
         /*[/]*/
     ];
 
-    // Se obtienen los elementos del formulario que se van a manipular con JavaScript
     const clienteIdInput = document.getElementById('clienteId');
     const clienteBusquedaInput = document.getElementById('clienteBusqueda');
     const clienteResultados = document.getElementById('clienteResultados');
     const clienteSeleccionado = document.getElementById('clienteSeleccionado');
 
-    // Esta función arma un texto general para poder buscar por diferentes datos del cliente
     function construirTextoBusqueda(cliente) {
         return [
-            String(cliente.id ?? ''),
+            cliente.cedula ?? '',
             cliente.nombre ?? '',
             cliente.telefono ?? '',
             cliente.email ?? '',
@@ -253,7 +192,6 @@
         ].join(' ').toLowerCase();
     }
 
-    // Esta función muestra visualmente el cliente que fue seleccionado
     function pintarClienteSeleccionado(cliente) {
         if (!cliente) {
             clienteSeleccionado.classList.add('d-none');
@@ -265,23 +203,21 @@
         clienteSeleccionado.innerHTML = `
             <strong>Cliente seleccionado:</strong> ${cliente.nombre}<br>
             <span class="text-muted small">
-                ID: ${cliente.id}
-                ${cliente.telefono ? ' | Teléfono: ' + cliente.telefono : ''}
+                Cedula: ${cliente.cedula}
+                ${cliente.telefono ? ' | Telefono: ' + cliente.telefono : ''}
                 ${cliente.email ? ' | Email: ' + cliente.email : ''}
                 ${cliente.canalContacto ? ' | Canal: ' + cliente.canalContacto : ''}
             </span>
         `;
     }
 
-    // Esta función guarda el cliente seleccionado en el input oculto
     function seleccionarCliente(cliente) {
         clienteIdInput.value = cliente.id;
-        clienteBusquedaInput.value = `${cliente.id} - ${cliente.nombre}`;
+        clienteBusquedaInput.value = `${cliente.cedula} - ${cliente.nombre}`;
         pintarClienteSeleccionado(cliente);
         clienteResultados.innerHTML = '';
     }
 
-    // Esta función busca si el usuario escribió un dato exacto del cliente
     function buscarCoincidenciaExacta(termino) {
         const texto = termino.trim().toLowerCase();
 
@@ -290,7 +226,7 @@
         }
 
         return clientesDisponibles.find(cliente =>
-            String(cliente.id) === texto
+            (cliente.cedula ?? '').toLowerCase() === texto
             || (cliente.nombre ?? '').toLowerCase() === texto
             || (cliente.telefono ?? '').toLowerCase() === texto
             || (cliente.email ?? '').toLowerCase() === texto
@@ -298,7 +234,6 @@
         ) ?? null;
     }
 
-    // Esta función muestra los resultados que coinciden con lo que se está buscando
     function renderizarResultados(termino) {
         const texto = termino.trim().toLowerCase();
 
@@ -318,16 +253,15 @@
 
         clienteResultados.innerHTML = coincidencias.map(cliente => `
             <button type="button" class="search-result-item" data-cliente-id="${cliente.id}">
-                <span class="fw-semibold">${cliente.id} - ${cliente.nombre}</span>
+                <span class="fw-semibold">${cliente.cedula} - ${cliente.nombre}</span>
                 <span class="small text-muted">
-                    ${cliente.telefono || 'Sin teléfono'}
+                    ${cliente.telefono || 'Sin telefono'}
                     ${cliente.email ? ' | ' + cliente.email : ''}
                     ${cliente.canalContacto ? ' | ' + cliente.canalContacto : ''}
                 </span>
             </button>
         `).join('');
 
-        // A cada botón de resultado se le agrega un evento para seleccionar el cliente
         document.querySelectorAll('.search-result-item').forEach(boton => {
             boton.addEventListener('click', () => {
                 const cliente = clientesDisponibles.find(item => item.id === Number(boton.dataset.clienteId));
@@ -336,7 +270,6 @@
         });
     }
 
-    // Cada vez que el usuario escribe, se busca una coincidencia exacta o resultados parecidos
     clienteBusquedaInput.addEventListener('input', (event) => {
         const termino = event.target.value;
         const coincidenciaExacta = buscarCoincidenciaExacta(termino);
@@ -351,14 +284,12 @@
         renderizarResultados(termino);
     });
 
-    // Si ya viene un cliente seleccionado desde el backend, se muestra automáticamente
     const clienteInicial = clientesDisponibles.find(cliente => cliente.id === Number(clienteIdInput.value));
 
     if (clienteInicial) {
-        clienteBusquedaInput.value = `${clienteInicial.id} - ${clienteInicial.nombre}`;
+        clienteBusquedaInput.value = `${clienteInicial.cedula} - ${clienteInicial.nombre}`;
         pintarClienteSeleccionado(clienteInicial);
     }
-
 </script>
 
 </body>

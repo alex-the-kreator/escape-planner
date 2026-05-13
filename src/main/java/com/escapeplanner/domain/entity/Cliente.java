@@ -11,10 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Entidad que almacena la información base del cliente.
+ * Entidad que almacena la informacion base del cliente.
  * Un cliente puede estar asociado a varios eventos dentro del sistema.
  *
- * @author Alex Mártin
+ * @author Alex Martin
  */
 @Entity
 @Table(name = "clientes")
@@ -23,6 +23,13 @@ public class Cliente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    // La cedula se maneja como dato funcional del cliente,
+    // mientras que el id sigue siendo la clave tecnica interna.
+    @NotBlank
+    @Size(max = 20)
+    @Column(nullable = false, unique = true, length = 20)
+    private String cedula;
 
     @NotBlank
     @Size(max = 150)
@@ -43,11 +50,11 @@ public class Cliente {
     @Column(name = "canal_contacto", length = 50)
     private String canalContacto;
 
-    //AQUÍ ESTÁ EL CAMBIO IMPORTANTE
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private EstadoCliente estado;
- @JsonIgnore
+
+    @JsonIgnore
     @OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Evento> eventos = new ArrayList<>();
 
@@ -56,6 +63,14 @@ public class Cliente {
 
     public Long getId() {
         return id;
+    }
+
+    public String getCedula() {
+        return cedula;
+    }
+
+    public void setCedula(String cedula) {
+        this.cedula = cedula;
     }
 
     public String getNombre() {
@@ -90,7 +105,6 @@ public class Cliente {
         this.canalContacto = canalContacto;
     }
 
-    // GETTER Y SETTER ACTUALIZADOS
     public EstadoCliente getEstado() {
         return estado;
     }

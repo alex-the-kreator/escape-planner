@@ -12,6 +12,10 @@ import java.util.List;
  */
 public interface ClienteRepository extends JpaRepository<Cliente, Long> {
 
-    // Esta búsqueda simple es util para una futura pantalla de selección de cliente
-    List<Cliente> findByNombreContainingIgnoreCaseOrEmailContainingIgnoreCase(String nombre, String email);
+    // La búsqueda del cliente ahora tambien contempla la cedula, porque es uno de los datos mas usados en operacion.
+    List<Cliente> findByCedulaContainingIgnoreCaseOrNombreContainingIgnoreCaseOrEmailContainingIgnoreCase(
+            String cedula,
+            String nombre,
+            String email
+    );
 }
