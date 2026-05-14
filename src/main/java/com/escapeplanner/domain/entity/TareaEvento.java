@@ -1,6 +1,7 @@
 package com.escapeplanner.domain.entity;
 
 import com.escapeplanner.domain.enums.EstadoTareaEvento;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -19,7 +20,7 @@ import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 
 /**
- * Representa las actividades de seguimiento necesarias para preparar un evento.
+ * Representa las actividades de seguimiento necesarias para preparar un event
  *
  * @author Alex Mártin
  */
@@ -31,18 +32,17 @@ public class TareaEvento {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // La tarea no necesita devoler todo el evento en la API de forma directa,y esto evita problemas de serializacion circular o proxies lazy en JSON
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "evento_id", nullable = false)
     private Evento evento;
 
-    // El nombre de la tarea describe una acción concreta del seguimiento,
-    // por ejemplo confirmar contrato o pedir la torta al proveedor.
     @NotBlank
     @Size(max = 100)
     @Column(nullable = false, length = 100)
     private String nombre;
 
-    //En la documentación definimos tres estados cerrados para la tarea.
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)

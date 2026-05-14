@@ -22,7 +22,7 @@ public class WebController {
      * Ruta principal del sistema.
      *
      * Cuando el usuario entra a la raíz del proyecto (/),
-     * automáticamente es redireccionado a la pantalla de login.
+     * automáticamente es redireccionado a la pantalla de login
      *
      */
     @GetMapping("/")

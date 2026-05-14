@@ -1,188 +1,325 @@
 package com.escapeplanner.controller;
 
+// Importa la entidad Cliente para trabajar con clientes en el formulario
 import com.escapeplanner.domain.entity.Cliente;
+
+// Importa la entidad Evento para convertir eventos a request cuando se editan
+import com.escapeplanner.domain.entity.Evento;
+
+// Importa la entidad Usuario para mostrar los responsables del evento
 import com.escapeplanner.domain.entity.Usuario;
+
+// Importa el enum de estados del evento
 import com.escapeplanner.domain.enums.EstadoEvento;
+
+// Importa el enum de sedes disponibles para el evento
+import com.escapeplanner.domain.enums.SedeEvento;
+
+// Importa el enum de tipos de evento
 import com.escapeplanner.domain.enums.TipoEvento;
+
+// Importa el DTO usado para recibir los datos del formulario
 import com.escapeplanner.dto.EventoRequest;
+
+// Importa la excepción de reglas de negocio
 import com.escapeplanner.exception.BusinessException;
+
+// Importa la excepción para recursos no encontrados
+import com.escapeplanner.exception.ResourceNotFoundException;
+
+// Importa el repositorio de usuarios
 import com.escapeplanner.repository.UsuarioRepository;
+
+// Importa el servicio de clientes
 import com.escapeplanner.service.ClienteService;
+
+// Importa el servicio de eventos
 import com.escapeplanner.service.EventoService;
+
+// Permite validar automáticamente el objeto recibido del formulario
 import jakarta.validation.Valid;
+
+// Marca la clase como controlador web de Spring MVC
 import org.springframework.stereotype.Controller;
+
+// Permite enviar datos desde el controlador hacia la vista
 import org.springframework.ui.Model;
+
+// Guarda los errores de validación del formulario
 import org.springframework.validation.BindingResult;
+
+// Mapea peticiones HTTP GET
 import org.springframework.web.bind.annotation.GetMapping;
+
+// Recibe datos desde el formulario y los convierte en objeto
 import org.springframework.web.bind.annotation.ModelAttribute;
+
+// Captura valores que vienen en la URL
+import org.springframework.web.bind.annotation.PathVariable;
+
+// Mapea peticiones HTTP POST
 import org.springframework.web.bind.annotation.PostMapping;
+
+// Define una ruta base para todo el controlador
 import org.springframework.web.bind.annotation.RequestMapping;
+
+// Permite enviar mensajes temporales después de una redirección
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+// Importa LocalDate para manejar fechas
 import java.time.LocalDate;
+
+// Importa LocalTime para manejar horas
 import java.time.LocalTime;
+
+// Importa List para manejar listas de clientes y usuarios
 import java.util.List;
 
 /**
- *
  * Controlador web del módulo de eventos.
  *
- * Esta clase se encarga de manejar todas las vistas
- * relacionadas con los eventos desde Thymeleaf.
+ * Esta clase maneja las rutas web relacionadas con:
+ * - listar eventos
+ * - registrar eventos
+ * - editar eventos
+ * - actualizar eventos
+ * - eliminar eventos
  *
- * El controlador trabaja junto con:
- * - EventoService
- * - ClienteService
- * - UsuarioRepository
- *
- * La API REST sigue funcionando de manera independiente.
- *
- * @author Alex Mártín
+ * @author Alex Mártin
  */
-@Controller
+
+
+@Controller// Indica que esta clase es un controlador de Spring
+
+// Define que todas las rutas de esta clase empiezan con /eventos
 @RequestMapping("/eventos")
 public class EventoWebController {
 
+    private final EventoService eventoService;// Servicio que contiene la lógica principal de eventos
+    private final ClienteService clienteService;// Servicio usado para consultar clientes registrados
+    private final UsuarioRepository usuarioRepository;// Repositorio usado para consultar usuarios responsables
 
-    private final EventoService eventoService;//Servicio principal encrgado de la lógica de negocio relacionada con los eventos
-    private final ClienteService clienteService; //Servicio encargado de obtener la información de los clientes registrados
-    private final UsuarioRepository usuarioRepository;//Repositorio utilizado para consultar los usuario directamente desde la base de datos.
-
-    /**
-     *
-     * Constructor del controlador.
-     *
-     * Spring Boot inyecta automáticamente las dependencias.
-     *
-     */
+    // Constructor donde Spring inyecta automáticamente las dependencias
     public EventoWebController(
-
             EventoService eventoService,
             ClienteService clienteService,
             UsuarioRepository usuarioRepository
-
     ) {
-
-        this.eventoService = eventoService;
-        this.clienteService = clienteService;
-        this.usuarioRepository = usuarioRepository;
+        this.eventoService = eventoService;// Se asigna el servicio de eventos recibido
+        this.clienteService = clienteService;// Se asigna el servicio de clientes recibido
+        this.usuarioRepository = usuarioRepository;// Se asigna el repositorio de usuarios recibido
     }
-
-    /**
-     *
-     * Método encargado de mostrar el listado de eventos.
-     *
-     * Obtiene todos los eventos desde el servicio
-     * y los envía a la vista lista.html.
-     *
-     */
+    // Atiende la ruta GET /eventos
     @GetMapping
     public String listar(Model model) {
 
-        model.addAttribute("eventos", eventoService.listar()); // Se agrega la lista de eventos al modelo
-        return "eventos/lista"; // Retorna la vista de listado
+        // Agrega al modelo la lista de eventos para mostrarla en la vista
+        model.addAttribute("eventos", eventoService.listar());
+
+        // Retorna la vista donde se listan los eventos
+        return "eventos/lista";
     }
 
-    /**
-     *
-     * Método encargado de cargar el formulario
-     * para registrar un nuevo evento.
-     *
-     */
+    // Atiende la ruta GET /eventos/nuevo
     @GetMapping("/nuevo")
     public String nuevo(Model model) {
 
-        //Se crea un objeto EventoRequest con dato por defecto para inicializar el formulario.
+        // Crea un request con valore por defecto para inicializar el formulario
+        model.addAttribute("eventoRequest", crearEventoRequestPorDefecto());
 
-        model.addAttribute(
-                "eventoRequest",
-                crearEventoRequestPorDefecto()
-        );
-        cargarCatalogos(model);// Se cargan clientes, usuarios y catálogos
-        return "eventos/formulario";// Retorna la vista formulario.html
+        // Prepara datos generales del formulari de creación
+        prepararFormularioBase(model, null, "Registrar evento", "Guardar evento", "/eventos/guardar");
+
+        cargarCatalogos(model);// Carga clientes, usuarios, tipos, sedes y estados para los selects
+
+        // Retorna la vista del formulario de eventos
+        return "eventos/formulario";
     }
 
-    /**
-     *
-     * Método encargado de guardar un evento.
-     *
-     * Recibe la información enviada desde el formulario.
-     *
-     * @Valid valida automáticamente las restricciones
-     * definidas en EventoRequest.
-     *
-     */
-    @PostMapping("/guardar")
+    // Atiende la ruta GET /eventos/{id}/editar
+    @GetMapping("/{id}/editar")
+    public String editar(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+
+        // Busca el evento por ID y, si existe, prepara el formulrio de edición
+        return eventoService.obtenerPorId(id)
+
+                // Si el evento existe, se convierte a EventoRequest para cargarlo en el formulario
+                .map(evento -> {
+
+                    // Agrega al modelo los datos del evento convertido a request
+                    model.addAttribute("eventoRequest", convertirARequest(evento));
+
+                    // Prepara datos generales del formulario de edición
+                    prepararFormularioBase(model, id, "Editar evento", "Actualizar evento", "/eventos/" + id + "/actualizar");
+
+                    // Carga los catálogos necesarios para los selects
+                    cargarCatalogos(model);
+
+                    // Retorna la vista del formulario
+                    return "eventos/formulario";
+                })
+
+                // Si el evento no existe, redirige al listado con mensaje de error
+                .orElseGet(() -> {
+
+                    // Agregaun mensaje temporal indicando que no se encontró el evento
+                    redirectAttributes.addFlashAttribute("errorMessage", "No se encontró el evento a editar.");
+
+                    // Redirige al listado de eventos
+                    return "redirect:/eventos";
+                });
+    }
+
+
+    @PostMapping("/guardar")// Atiende la ruta POST /eventos/guardar
     public String guardar(
 
-            @Valid
-            @ModelAttribute("eventoRequest")
-            EventoRequest eventoRequest,
+            // Recibe y valida los datos enviados desde el formulario
+            @Valid @ModelAttribute("eventoRequest") EventoRequest eventoRequest,
 
-            BindingResult bindingResult,
-
-            Model model,
-
-            RedirectAttributes redirectAttributes
-
+            BindingResult bindingResult,// Contiene los errores de validación si existen
+            Model model,// Modelo para devolver datos a la vista
+            RedirectAttributes redirectAttributes  // Permite enviar mensajes temporales después de redireccionar
     ) {
 
-        if (bindingResult.hasErrors()) {//Si existen errores de validación se vuelve a cargar el formulario.
+        // Si existen errores de validación, se vuelve al formulario
+        if (bindingResult.hasErrors()) {
 
-            cargarCatalogos(model);
-
+            // Se vuelve a preparar el formulario de creación
+            prepararFormularioBase(model, null, "Registrar evento", "Guardar evento", "/eventos/guardar");
+            cargarCatalogos(model);// Se cargan de nuevo los catálogos para que los selects no queden vacíos
             return "eventos/formulario";
         }
 
         try {
-
-            //Se registra el evento utizand la lógica de negocio del servicio
+            // Intenta registrar el evento usando el servicio
             eventoService.registrar(eventoRequest);
 
-            //Mensaje temporal de éxito después de guardar correctamente
+            // Agrega mensaje de éxito temporal
+            redirectAttributes.addFlashAttribute("successMessage", "Evento registrado correctamente.");
 
-            redirectAttributes.addFlashAttribute(
-                    "successMessage",
-                    "Evento registrado correctamente."
-            );
-            return "redirect:/eventos";// Redirección al listado de eventos
+            return "redirect:/eventos";
 
         } catch (BusinessException ex) {
 
-            //Si ocurre un error de negocio se muestra el mensaje en pantalla
-            model.addAttribute(
-                    "errorMessage",
-                    ex.getMessage()
-            );
+            // Si ocurre un error de negocio, se muesta el mensaje en el formulario
+            model.addAttribute("errorMessage", ex.getMessage());
 
-            cargarCatalogos(model);// Se vuelven a cargar los catálogos
-            return "eventos/formulario";// Retorna nuevamente al formulario
+            // Se vuelve a preparar el formulario de creación
+            prepararFormularioBase(model, null, "Registrar evento", "Guardar evento", "/eventos/guardar");
+
+            // Se recargan los catálogos
+            cargarCatalogos(model);
+
+            // Retorna nuevamente al formulario
+            return "eventos/formulario";
         }
     }
 
-    /**
-     *
-     * Método privado para crear un EventoRequest
-     * con valores iniciales por defecto.
-     *
-     * Esto permite que el formulario cargue
-     * información inicial automáticamente.
-     *
-     */
+    // Atiende la ruta POST /eventos/{id}/actualizar
+    @PostMapping("/{id}/actualizar")
+    public String actualizar(
+
+            // Captura el ID del evento desde la URL
+            @PathVariable Long id,
+
+            // Recibe y valida los datos del formulario
+            @Valid @ModelAttribute("eventoRequest") EventoRequest eventoRequest,
+
+            // Contiene los errores de validación
+            BindingResult bindingResult,
+
+            // Modelo para enviar datos a la vista
+            Model model,
+
+            // Permite enviar mensajes temporales
+            RedirectAttributes redirectAttributes
+    ) {
+
+        // Si hay errores de validación, se vuelve al formulario de edición
+        if (bindingResult.hasErrors()) {
+
+            // Se vuelve a preparar el formulario en modo edición
+            prepararFormularioBase(model, id, "Editar evento", "Actualizar evento", "/eventos/" + id + "/actualizar");
+
+            // Se cargan nuevamente los catálogos
+            cargarCatalogos(model);
+
+            // Retorna al formulario
+            return "eventos/formulario";
+        }
+
+        try {
+            // Intenta actualizar el evento usando el servicio
+            eventoService.actualizar(id, eventoRequest);
+
+            // Agrega mensaje de éxito temporal
+            redirectAttributes.addFlashAttribute("successMessage", "Evento actualizado correctamente.");
+
+            // Redirige al listado
+            return "redirect:/eventos";
+
+        } catch (BusinessException ex) {
+
+            // Si ocurre un error de negocio, se muestra en el formulario
+            model.addAttribute("errorMessage", ex.getMessage());
+
+            // Se vuelve a preparar el formulario en modo edición
+            prepararFormularioBase(model, id, "Editar evento", "Actualizar evento", "/eventos/" + id + "/actualizar");
+
+            // Se recargan los catálogos
+            cargarCatalogos(model);
+
+            // Retorna al formulario
+            return "eventos/formulario";
+
+        } catch (ResourceNotFoundException ex) {
+
+            // Si no se encuentra el evento, se envía mensaje temporal
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+
+            // Redirige al listado de eventos
+            return "redirect:/eventos";
+        }
+    }
+
+    // Atiende la ruta POST /eventos/{id}/eliminar
+    @PostMapping("/{id}/eliminar")
+    public String eliminar(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+
+        try {
+            // Intenta eliminar el evento usando el ID recibido
+            eventoService.eliminar(id);
+
+            // Agrega mensaje de éxito temporal
+            redirectAttributes.addFlashAttribute("successMessage", "Evento eliminado correctamente.");
+
+        } catch (ResourceNotFoundException ex) {
+
+            // Si no se encuentra el evento, muestra el error
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        }
+
+        // Redirige nuevamente al listado de eventos
+        return "redirect:/eventos";
+    }
+
+    // Crea un EventoRequest con valores iniciales para el formulario de registro
     private EventoRequest crearEventoRequestPorDefecto() {
 
+        // Retorna un objeto EventoRequest con datos por defecto
         return new EventoRequest(
 
-                // Cliente ID
+                // Cliente inicial vacío
                 null,
 
-                // Usuario ID
+                // Usuario inicial vacío
                 null,
 
                 // Tipo de evento por defecto
                 TipoEvento.CUMPLEANOS,
 
-                // Fecha actual
+                // Fecha actual por defecto
                 LocalDate.now(),
 
                 // Hora de inicio por defecto
@@ -191,13 +328,16 @@ public class EventoWebController {
                 // Hora final por defecto
                 LocalTime.of(16, 0),
 
+                // Sede por defecto
+                SedeEvento.NIZA,
+
                 // Número inicial de personas
                 1,
 
                 // Estado inicial del evento
                 EstadoEvento.PENDIENTE,
 
-                // El bloqueo inicia desactivado
+                // Bloqueo desactivado por defecto
                 Boolean.FALSE,
 
                 // Detalles logísticos vacíos
@@ -205,37 +345,64 @@ public class EventoWebController {
         );
     }
 
-    /**
-     *
-     * Método privado encargado de cargar
-     * toda la información necesaria para
-     * los selects y formularios.
-     *
-     */
+    // Convierte una entidad Evento en un EventoRequest para cargar datos en el formulario
+    private EventoRequest convertirARequest(Evento evento) {
+
+        // Retorna un request con los datos actuales del evento
+        return new EventoRequest(
+
+                evento.getCliente().getId(),
+                evento.getUsuario().getId(),
+                evento.getTipo(),
+                evento.getFecha(),
+                evento.getHoraInicio(),
+                evento.getHoraFin(),
+                evento.getSede(),
+                evento.getNumPersonas(),
+                evento.getEstado(),
+                evento.getRequiereBloqueo(),
+                evento.getDetallesLogisticos()
+        );
+    }
+
+    // Prepara información básica que necesita el formulario
+    private void prepararFormularioBase(Model model, Long eventoId, String titulo, String boton, String accion) {
+
+        // ID del evento, usado principalmente cuando se edita
+        model.addAttribute("eventoId", eventoId);
+
+        // Título que se mostrará en el formulario
+        model.addAttribute("formTitle", titulo);
+
+        // Texto del botón principal
+        model.addAttribute("submitLabel", boton);
+
+        // Ruta a la que enviará el formulario
+        model.addAttribute("formAction", accion);
+    }
+
+    // Carga los catálogos necesarios para el formulario
     private void cargarCatalogos(Model model) {
 
-        // Obtiene la lista de clientes
-        List<Cliente> clientes = clienteService.listar();
 
-        // Obtiene la lista de usuarios
-        List<Usuario> usuarios = usuarioRepository.findAll();
+        List<Cliente> clientes = clienteService.listar();// Obtiene todos los clientes registrados
 
-        //Se agregan los datos al modelo para ser utilizados en Thymeleaf
-        model.addAttribute("clientes", clientes);
 
-        model.addAttribute("usuarios", usuarios);
+        List<Usuario> usuarios = usuarioRepository.findAll();// Obtiene todos los usuarios registrados
 
-        //values() obtiene todos los valores del enum TipoEvento
-        model.addAttribute(
-                "tiposEvento",
-                TipoEvento.values()
-        );
 
-        //values() obtiene todos losvalores del enum EstadoEvento.
+        model.addAttribute("clientes", clientes); // Agrega clientes al modelo
 
-        model.addAttribute(
-                "estadosEvento",
-                EstadoEvento.values()
-        );
+
+        model.addAttribute("usuarios", usuarios);// Agrega usuarios al modelo
+
+
+        model.addAttribute("tiposEvento", TipoEvento.values());// Agrega todos los tipos de evento al modelo
+
+
+        model.addAttribute("sedesEvento", SedeEvento.values());// Agrega todas las sedes disponibles al modelo
+
+
+        model.addAttribute("estadosEvento", EstadoEvento.values()); // Agrega todos los estados de evento al modelo
     }
 }

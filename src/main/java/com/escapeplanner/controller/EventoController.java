@@ -185,10 +185,8 @@ public class EventoController {
                 eventoIdExcluir
         );
 
-        /*
-         * Se construye una respuesta detallada para facilitar las pruebas.
-         * LinkedHashMap permite conservar el orden en qu se agregan los datos.
-         */
+        //Se construye una respuesta detallada para facilitar las pruebas. LinkedHashMap permite conservar el orden en qu se agregan los datos.
+
         Map<String, Object> respuesta = new LinkedHashMap<>();
 
         // Se agregan los datos recibidos y el resultado de la validación

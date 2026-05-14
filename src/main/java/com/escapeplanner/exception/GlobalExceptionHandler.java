@@ -25,7 +25,7 @@ import java.util.Map;// Estructura usada para construir respuestas de error en f
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    //Maneja los errores cuando un recurso no existPor ejemplo, cuando se intenta buscar un cliente, usuario o eventO con un ID que no está registrado en la base de datos.
+    //Maneja los errores cuando un recurso no existpor ejemplo, cuando se intenta buscar un cliente, usuario o eventO con un ID que no está registrado en la base de datos.
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Map<String, Object>> manejarResourceNotFound(
             ResourceNotFoundException ex

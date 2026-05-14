@@ -23,10 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Representa a los usuarios internos que pueden ingresar al sistema.
+ * Representa a los usarios internos que pueden ingresar al sistema.
  * En esta primera etapa se contemplan los roles ASESOR y ADMINISTRADOR.
  *
- * @author Alex M\u00E1rtin
+ * @author Alex Mártin
  */
 @Entity
 @Table(name = "usuarios")
@@ -58,13 +58,13 @@ public class Usuario {
     @Column(nullable = false, length = 30)
     private RolUsuario rol;
 
-    // El estado se tipa como enum para evitar valores libres y mantener consistencia con lo definido en la documentacion.
+    // El estado se tipa como enum para evitar valors libres y mantener consistencia con lo definido en la documentación
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private EstadoUsuario estado;
 
-    // Esta relacion inversa no aporta en la respuesta del evento y ademas puede generar serializacion circular.
+    // Esta relación inversa no aporta en l respuesta del evento y ademas puede generar serialización circular
     @JsonIgnore
     @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Evento> eventos = new ArrayList<>();

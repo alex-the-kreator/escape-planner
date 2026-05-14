@@ -9,7 +9,7 @@
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
                     <p class="section-kicker">Modulo web</p>
-                    <h1 class="h2 mb-1">Registrar cliente</h1>
+                    <h1 class="h2 mb-1" th:text="${formTitle}">Registrar cliente</h1>
                     <p class="text-muted mb-0">Formulario temporal para pruebas funcionales con Thymeleaf.</p>
                 </div>
                 <a class="btn btn-outline-secondary" th:href="@{/clientes}">Volver</a>
@@ -17,7 +17,7 @@
 
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-4 p-lg-5">
-                    <form th:action="@{/clientes/guardar}" th:object="${clienteRequest}" method="post" novalidate>
+                    <form th:action="${formAction}" th:object="${clienteRequest}" method="post" novalidate>
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label for="cedula" class="form-label">Cedula</label>
@@ -54,7 +54,7 @@
                         </div>
                         <div class="d-flex justify-content-end gap-2 mt-4">
                             <a class="btn btn-outline-secondary" th:href="@{/clientes}">Cancelar</a>
-                            <button type="submit" class="btn btn-primary">Guardar cliente</button>
+                            <button type="submit" class="btn btn-primary" th:text="${submitLabel}">Guardar cliente</button>
                         </div>
                     </form>
                 </div>

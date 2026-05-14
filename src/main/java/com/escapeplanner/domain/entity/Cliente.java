@@ -11,10 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Entidad que almacena la informacion base del cliente.
+ * Entidad que almacena la informacion bas del cliente.
  * Un cliente puede estar asociado a varios eventos dentro del sistema.
  *
- * @author Alex Martin
+ * @author Alex Mártin
  */
 @Entity
 @Table(name = "clientes")
@@ -25,7 +25,7 @@ public class Cliente {
     private Long id;
 
     // La cedula se maneja como dato funcional del cliente,
-    // mientras que el id sigue siendo la clave tecnica interna.
+    // mientras que el id sigue siendo la clve tecnica interna.
     @NotBlank
     @Size(max = 20)
     @Column(nullable = false, unique = true, length = 20)

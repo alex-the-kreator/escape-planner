@@ -2,6 +2,7 @@ package com.escapeplanner.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.escapeplanner.domain.enums.EstadoEvento;
+import com.escapeplanner.domain.enums.SedeEvento; //Importamos sede evento
 import com.escapeplanner.domain.enums.TipoEvento;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -30,7 +31,7 @@ import java.util.List;
 
 /**
  * Entidad central del sistema.
- * Desde aquí se relacionan los datos principales del evento y su seguimiento
+ * Desde aquí se relacionan los dtos principales del evento y su seguimiento
  *
  * @author Alex Mártin
  */
@@ -55,7 +56,7 @@ public class Evento {
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
 
-    // Se usa enum porque en la documentación ya deja cerrados los tipos de evento esperados por el MVP
+    // Se usa enum porque en la documentacón ya deja cerrados los tipos de evento esperados por el MVP
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50)
@@ -73,7 +74,12 @@ public class Evento {
     @Column(name = "hora_fin", nullable = false)
     private LocalTime horaFin;
 
-    // La cantidad de personas no debe ser cero ni negativa
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 30)
+    private SedeEvento sede;
+
+    // La cantidd de personas no debe ser cero ni negativa
     @NotNull
     @Positive
     @Column(name = "num_personas", nullable = false)
@@ -189,6 +195,14 @@ public class Evento {
 
     public void setHoraFin(LocalTime horaFin) {
         this.horaFin = horaFin;
+    }
+
+    public SedeEvento getSede() {
+        return sede;
+    }//Implementación de sedes
+
+    public void setSede(SedeEvento sede) {
+        this.sede = sede;
     }
 
     public Integer getNumPersonas() {

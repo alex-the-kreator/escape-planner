@@ -15,12 +15,12 @@ import java.util.Optional;
 /**
  * Repositorio principal del modulo de eventos.
  *
- * @author Alex M\u00E1rtin
+ * @author Alex Mártin
  */
 public interface EventoRepository extends JpaRepository<Evento, Long> {
 
     // Para la capa web y la API conviene traer cliente y usuario junto al evento,
-    // evitando fallos de carga lazy cuando la vista o el JSON necesitan esos datos.
+    // evitando fallos de carga lazy cuando la vista o el JSON necesitan esos datos
     @EntityGraph(attributePaths = {"cliente", "usuario"})
     List<Evento> findAllByOrderByFechaAscHoraInicioAsc();
 
@@ -28,8 +28,7 @@ public interface EventoRepository extends JpaRepository<Evento, Long> {
     @EntityGraph(attributePaths = {"cliente", "usuario"})
     Optional<Evento> findById(Long id);
 
-    // Detecta cruces de horario el mismo dia. La condicion horaInicio < horaFinNueva y horaFin > horaInicioNueva
-    // es la forma clasica de verificar solapamiento entre rangos.
+    // Detecta cruces de horario el mismo dia. La codicion horaInicio < horaFinNueva y horaFin > horaInicioNueva
     @Query("""
             select count(e) > 0
             from Evento e

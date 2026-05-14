@@ -1,10 +1,10 @@
 package com.escapeplanner.exception;
 
 /**
- * Excepcion simple para indicar que un recurso solicitado
+ * Excepción simple para indicar que un recurso solicitado
  * no existe en la base de datos.
  *
- * @author Alex M\u00E1rtin
+ * @author Alex Mártin
  */
 public class ResourceNotFoundException extends RuntimeException {
 

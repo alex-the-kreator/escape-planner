@@ -1,34 +1,36 @@
 package com.escapeplanner.service.impl;
 
-
-import com.escapeplanner.domain.entity.Cliente;// Entidades principales utilizadas por el servicio
-import com.escapeplanner.domain.entity.Evento;// Cliente y Usuario son necesarios porque cada evento debe quedar asociado a ambos
+import com.escapeplanner.domain.entity.Cliente;
+import com.escapeplanner.domain.entity.Evento;
 import com.escapeplanner.domain.entity.Usuario;
-import com.escapeplanner.domain.enums.EstadoEvento;// Enum que define los posibles estados del evento, como CONFIRMADO o CANCELADO
-import com.escapeplanner.dto.EventoRequest;// DTO que recibe los datos necesarios para registrar o actualizar un evento
-import com.escapeplanner.exception.BusinessException;// Excepciones personalizadas utilizadas para controlar errores de negocio y recursos no encontrados
+import com.escapeplanner.domain.enums.EstadoEvento;
+import com.escapeplanner.dto.EventoRequest;
+import com.escapeplanner.exception.BusinessException;
 import com.escapeplanner.exception.ResourceNotFoundException;
-import com.escapeplanner.repository.ClienteRepository;// Repositorios encargados del acceso a datos de cada entidad
+import com.escapeplanner.repository.ClienteRepository;
 import com.escapeplanner.repository.EventoRepository;
 import com.escapeplanner.repository.UsuarioRepository;
-import com.escapeplanner.service.EventoService;// Interfaz que esta clase implementa
-import org.springframework.stereotype.Service;// Anotaciones de Spring para declarar el servicio y controlar transacciones
+import com.escapeplanner.service.EventoService;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-// Clases para el manejo de fechas, horas, listas y valores opcionales
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
 /**
- * Implementación de la capa de servicio para el módulo de eventos
+ * Implementación de la capa de servicio para el módulo de eventos.
  *
- * En esta clase se centraliza la lógica principal relacionada con los eventos,
- * como el registro, actualización, consulta y validación de conflictos de horario
+ * Esta clase contiene toda la lógica de negocio relacionada
+ * con el manejo de eventos dentro del sistema Escape Planner.
  *
- * También se valida que el cliente y el usuario asociados al evento existan
- * antes de guardar o actualizar la información
+ * Aquí se realizan operaciones como:
+ * - registrar eventos
+ * - actualizar eventos
+ * - validar conflictos horarios
+ * - consultar eventos
+ * - eliminar eventos
  *
  * @author Alex Mártin
  */
@@ -36,17 +38,11 @@ import java.util.Optional;
 @Transactional
 public class EventoServiceImpl implements EventoService {
 
-    private final EventoRepository eventoRepository; //Repositorio encargado de gestionar las operaciones de persistenciarelacionadas con la entidad Evento
-    private final ClienteRepository clienteRepository; //Repositorio utilizado para consultar clientes existentes, esto permite validar que el evento siemre quede asociado a un cliente válido
-    private final UsuarioRepository usuarioRepository; //Repositorio utilizado para consultar usuarios existentes, esto permite asignarcorrectamente el responsable o usuario relacionado al evento.
+    private final EventoRepository eventoRepository;// Repositorio encargado de las operaciones de eventos en base de datos
+    private final ClienteRepository clienteRepository;// Repositorio utilizado para consultar clientes
+    private final UsuarioRepository usuarioRepository;// Repositorio utilizado para consultar usuarios responsables
 
-    /**
-     * Constructor de la clase
-     *
-     * Se utiliza inyección de dependencias por constructor, ya que es una buena práctica
-     * en Spring Boot. De sta forma, Spring entrega automáticamente los repositorios
-     * necesarios para que el servicio pueda funcionar
-     */
+    // Constructor donde Spring inyecta automáticamente los repositorios
     public EventoServiceImpl(
             EventoRepository eventoRepository,
             ClienteRepository clienteRepository,
@@ -57,20 +53,15 @@ public class EventoServiceImpl implements EventoService {
         this.usuarioRepository = usuarioRepository;
     }
 
-    /**
-     * Registra un nuevo evento en el sistema
-     *
-     * Primero se valida que el cliente y el usuario existan
-     * Luego se revisa si el event confirmado genera conflicto de horario
-     * Finalmente, se mapean los datos del request hacia la entidad Evento
-     * y se guarda en la base de datos
-     */
+    // Método encargado de registrar un nuevo evento
     @Override
     public Evento registrar(EventoRequest request) {
-        Cliente cliente = obtenerClienteExistente(request.clienteId());
-        Usuario usuario = obtenerUsuarioExistente(request.usuarioId());
 
-        validarConfirmacionSinConflicto(
+        Cliente cliente = obtenerClienteExistente(request.clienteId());// Se valida que el cliente exista
+        Usuario usuario = obtenerUsuarioExistente(request.usuarioId());// Se valida que el usuario responsable exista
+
+
+        validarConfirmacionSinConflicto(// Se valida que no exista conflicto horario
                 request.fecha(),
                 request.horaInicio(),
                 request.horaFin(),
@@ -78,28 +69,21 @@ public class EventoServiceImpl implements EventoService {
                 null
         );
 
-        Evento evento = new Evento();
-        mapearDatos(request, evento, cliente, usuario);
-
-        return eventoRepository.save(evento);
+        Evento evento = new Evento();// Se crea una nueva instancia del evento
+        mapearDatos(request, evento, cliente, usuario);// Se copian los datos del request hacia la entidad
+        return eventoRepository.save(evento);// Se guarda el evento en base de datos
     }
 
-    /**
-     * Actualiza un evento existente
-     *
-     * Primero se valida que el evento exista.
-     * Después se validan nuevamente el cliente y el usuario asociados
-     * También se revisa ue no exista conflicto de horario si el evento queda confirmado
-     *
-     * En este caso se envía el ID del evento actual para excluirlo de la comparación,
-     * evitando que el sistema lo tome como conflicto consigo mismo
-     */
+    // Método encargado de actualizar un evento existente
     @Override
     public Evento actualizar(Long eventoId, EventoRequest request) {
-        Evento eventoExistente = obtenerEventoExistente(eventoId);
-        Cliente cliente = obtenerClienteExistente(request.clienteId());
-        Usuario usuario = obtenerUsuarioExistente(request.usuarioId());
 
+
+        Evento eventoExistente = obtenerEventoExistente(eventoId); // Se valida que el evento exista
+        Cliente cliente = obtenerClienteExistente(request.clienteId());// Se valida que el cliente exista
+        Usuario usuario = obtenerUsuarioExistente(request.usuarioId());// Se valida que el usuario exista
+
+        // Se valida nuevamente el conflicto horario
         validarConfirmacionSinConflicto(
                 request.fecha(),
                 request.horaInicio(),
@@ -108,52 +92,48 @@ public class EventoServiceImpl implements EventoService {
                 eventoId
         );
 
-        mapearDatos(request, eventoExistente, cliente, usuario);
-
-        return eventoRepository.save(eventoExistente);
+        mapearDatos(request, eventoExistente, cliente, usuario);// Se actualizan los datos del evento
+        return eventoRepository.save(eventoExistente);// Se guardan los cambios
     }
 
-    /**
-     * Lista todos los eventos registrados
-     *
-     * Se utiliza una consulta personalizada del repositorio para ordenarlos
-     * por fecha ascendente y hora e inicio ascendente
-     */
+    // Método para listar todos los eventos registrados
     @Override
     @Transactional(readOnly = true)
     public List<Evento> listar() {
+
+        // Retorna los eventos ordenados por fecha y hora
         return eventoRepository.findAllByOrderByFechaAscHoraInicioAsc();
     }
 
-    /**
-     * Busca un evento por su ID
-     *
-     * Se retorna Optional porque puede existir la posibilidad de que
-     * no se encuentre ningún evento con el ID recibido
-     */
+    // Método para buscar un evento por ID
     @Override
     @Transactional(readOnly = true)
     public Optional<Evento> obtenerPorId(Long id) {
-        return eventoRepository.findById(id);
+
+        return eventoRepository.findById(id); // Se retorna Optional porque el evento puede existir o no
     }
 
-    /**
-     * Verifica si existe un conflicto de horario para una fecha y rango de horas.
-     *
-     * Esta validación se apoya en el repositorio de eventos
-     * Además, se excluyen los eventoscancelados porque estos no deben bloquear
-     * la programación de nuevos eventos
-     */
+    // Método para verificar si existe conflicto de horarios
     @Override
     @Transactional(readOnly = true)
     public boolean existeConflictoHorario(
+
             LocalDate fecha,
             LocalTime horaInicio,
             LocalTime horaFin,
             Long eventoIdExcluir
-    ) {
-        Long idExcluirSeguro = eventoIdExcluir != null ? eventoIdExcluir : -1L;
 
+    ) {
+
+        /*
+            Si el ID es null se usa un valor seguro (-1)
+            para evitar errores en la consulta.
+         */
+        Long idExcluirSeguro = eventoIdExcluir != null
+                ? eventoIdExcluir
+                : -1L;
+
+        // Consulta si existe cruce de horarios
         return eventoRepository.existsConflictoHorario(
                 fecha,
                 horaInicio,
@@ -163,59 +143,59 @@ public class EventoServiceImpl implements EventoService {
         );
     }
 
-    /**
-     * Obtiene un evento existente por ID.
-     *
-     * Este método e usa internamente cuando el evento debe existir obligatoriamente,
-     * por ejemplo, al actualizarlo. Si no existe, se lanza una excepción controlada
-     */
+    // Método para eliminar un evento
+    @Override
+    public void eliminar(Long id) {
+
+        Evento evento = obtenerEventoExistente(id);// Se valida que el evento exista
+        eventoRepository.delete(evento);// Se elimina el evento encontrado
+    }
+
+    // Método privado para obtener un evento existente
     private Evento obtenerEventoExistente(Long eventoId) {
+
         return eventoRepository.findById(eventoId)
+
                 .orElseThrow(() -> new ResourceNotFoundException(
+
                         "No se encontró el evento con id: " + eventoId
                 ));
     }
 
-    /**
-     * Obtiene un cliente existente por ID.
-     *
-     * Esta validación garantiza que no se registre un evento asociado
-     * a un cliente inexstente
-     */
+    // Método privado para obtener un cliente existente
     private Cliente obtenerClienteExistente(Long clienteId) {
+
         return clienteRepository.findById(clienteId)
+
                 .orElseThrow(() -> new ResourceNotFoundException(
+
                         "No se encontró el cliente con id: " + clienteId
                 ));
     }
 
-    /**
-     * Obtiene un usuario existente por ID.
-     *
-     * Esta validación garantiza que el evento quede asociado a un usuario válido
-     * dentro del sistema.
-     */
+    // Método privado para obtener un usuario existente
     private Usuario obtenerUsuarioExistente(Long usuarioId) {
+
         return usuarioRepository.findById(usuarioId)
+
                 .orElseThrow(() -> new ResourceNotFoundException(
+
                         "No se encontró el usuario con id: " + usuarioId
                 ));
     }
 
-    /**
-     * Valida la regla de negocio relacionada con conflictos de horario.
-     *
-     * La regla definida es:
-     * si un evento se quiere registrar o actualizar con estado CONFIRMADO,
-     * no debe existir otro evento confirmado en el mismo rango de tiempo.
-     */
+    // Método privado para validar conflictos antes de confirmar un evento
     private void validarConfirmacionSinConflicto(
+
             LocalDate fecha,
             LocalTime horaInicio,
             LocalTime horaFin,
             EstadoEvento estado,
             Long eventoIdExcluir
+
     ) {
+
+        // Se consulta si existe cruce de horarios
         boolean hayConflicto = existeConflictoHorario(
                 fecha,
                 horaInicio,
@@ -223,34 +203,39 @@ public class EventoServiceImpl implements EventoService {
                 eventoIdExcluir
         );
 
+        /*
+            Si existe conflicto y el evento
+            intenta quedar confirmado,
+            se lanza una excepción de negocio.
+         */
         if (hayConflicto && EstadoEvento.CONFIRMADO.equals(estado)) {
+
             throw new BusinessException(
-                    "Ash! No se puede confirmar el evento porque existe conflicto de horario."
+
+                    "Ash! No se puede confirmar el evento porque se cruzan los horarios."
             );
         }
     }
 
-    /**
-     * Mapea los datos recibidos desde el DTO hacia la entidad Evento.
-     *
-     * Este método se centraliza para evitar repetir el mismo código
-     * tanto en el registro como en la actualización de eventos.
-     */
+    // Método privado para copiar datos del request hacia la entidad Evento
     private void mapearDatos(
+
             EventoRequest request,
             Evento evento,
             Cliente cliente,
             Usuario usuario
+
     ) {
-        evento.setCliente(cliente);
-        evento.setUsuario(usuario);
-        evento.setTipo(request.tipo());
-        evento.setFecha(request.fecha());
-        evento.setHoraInicio(request.horaInicio());
-        evento.setHoraFin(request.horaFin());
-        evento.setNumPersonas(request.numPersonas());
-        evento.setEstado(request.estado());
-        evento.setRequiereBloqueo(request.requiereBloqueo());
-        evento.setDetallesLogisticos(request.detallesLogisticos());
+        evento.setCliente(cliente);// Cliente asociado al evento
+        evento.setUsuario(usuario);// Usuario responsable del evento
+        evento.setTipo(request.tipo());// Tipo de evento
+        evento.setFecha(request.fecha());// Fecha del evento
+        evento.setHoraInicio(request.horaInicio());// Hora inicial
+        evento.setHoraFin(request.horaFin());// Hora final
+        evento.setSede(request.sede());// Sede donde se realizará
+        evento.setNumPersonas(request.numPersonas());// Número de personas
+        evento.setEstado(request.estado());// Estado actual del evento
+        evento.setRequiereBloqueo(request.requiereBloqueo());// Define si requiere bloqueo
+        evento.setDetallesLogisticos(request.detallesLogisticos());// Información logística adicional
     }
 }

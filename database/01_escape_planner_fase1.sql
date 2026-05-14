@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS eventos (
     fecha DATE NOT NULL,
     hora_inicio TIME NOT NULL,
     hora_fin TIME NOT NULL,
+    sede VARCHAR(30) NOT NULL,
     num_personas INTEGER NOT NULL,
     estado VARCHAR(30) NOT NULL,
     requiere_bloqueo BOOLEAN NOT NULL DEFAULT FALSE,
@@ -35,7 +36,8 @@ CREATE TABLE IF NOT EXISTS eventos (
     CONSTRAINT fk_eventos_cliente
         FOREIGN KEY (cliente_id) REFERENCES clientes (id),
     CONSTRAINT fk_eventos_usuario
-        FOREIGN KEY (usuario_id) REFERENCES usuarios (id)
+        FOREIGN KEY (usuario_id) REFERENCES usuarios (id),
+    CONSTRAINT chk_eventos_sede CHECK (sede IN ('CEDRITOS', 'NIZA', 'MULTIPLAZA', 'LAGO'))
 );
 
 CREATE TABLE IF NOT EXISTS tareas_evento (

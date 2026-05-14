@@ -1,26 +1,79 @@
 package com.escapeplanner.service;
 
-import com.escapeplanner.domain.entity.TareaEvento;// Importo la entidad TareaEvento, que representa las tareas en la base de datos
-import com.escapeplanner.dto.TareaEventoRequest; // Importo el DTO que se usa para recibir los datos desde el controlador
-import java.util.List;// Importo List para poder manejar listas de tareas
+import com.escapeplanner.domain.entity.TareaEvento;
+import com.escapeplanner.dto.TareaEventoRequest;
+
+import java.util.List;
+import java.util.Optional;
 
 /**
- * Esta interfaz define las operaciones relacionadas con las tareas que hacen parte del seguimiento de un evento
- * Aquí se establece qué se puede hacer con las tareas, pero la lógica se implementa en otra clase (service.impl)
+ *
+ * Interfaz de servicio para manejar las tareas asociadas a un evento.
+ *
+ * Esta interfaz define las operaciones principales que se pueden realizar
+ * sobre las tareas de seguimiento dentro del sistema Escape Planner.
+ *
+ * Al ser una interfaz, aquí solo se declaran los métodos.
+ * La lógica real se implementa después en la clase de servicio TareaEventoServiceImpl
  *
  * @author Alex Mártin
  */
 public interface TareaEventoService {
 
-    // Método para registrar una nueva tarea asociada a un evento
-    // Recibe los datos desde un DTO y devuelve la tarea creada
+    /**
+     *
+     * Registra una nueva tarea relacionada con un evento.
+     *
+     * Recibe un objeto TareaEventoRequest con la información necesaria
+     * para crear la tarea, como el evento al que pertenece,
+     * la descripción, el responsable y el estado
+     *
+     * @param request datos enviados para crear la tarea
+     * @return la tarea creada y guardada en el sistema
+     */
     TareaEvento registrar(TareaEventoRequest request);
 
-    // Método para actualizar el estado de una tarea (por ejemplo: pendiente, en proceso, completada)
-    // Se identifica la tarea por su ID y se actualiza con la información del request
+    //Actualiza el estado o la información de una tarea existente.
+    //Se recibe el ID de la tarea para identificar cuál se va a modificar y un request con los nuevos datos enviados desde la petición.
+
+    // @param tareaId identificador de la tarea que se desea actualizar
+    // @param request datos nuevos de la tarea
+    // @return la tarea actualizada
+
     TareaEvento actualizarEstado(Long tareaId, TareaEventoRequest request);
 
-    // Método para obtener todas las tareas asociadas a un evento específico
-    // Se usa el ID del evento para filtrar las tareas
+    /**
+     *
+     * Lista todas las tareas asociadas a un evento específico.
+     *
+     * Este método sirve para consultar el seguimiento de un evento,
+     * mostrando las tareas que pertenecen a dicho evento.
+     *
+     * @param eventoId identificador del evento
+     * @return lista de tareas relacionadas con el evento
+     */
     List<TareaEvento> listarPorEvento(Long eventoId);
+
+    /**
+     *
+     * Busca una tarea por su ID.
+     *
+     * Se usa Optional porque puede existir o no una tarea
+     * con el identificador enviado.
+     *
+     * @param id identificador de la tarea
+     * @return Optional con la tarea si existe, o vacío si no se encuentra
+     */
+    Optional<TareaEvento> obtenerPorId(Long id);
+
+    /**
+     *
+     * Elimina una tarea del sistema usando su ID.
+     *
+     * Este método no retorna ningún valor porque su objetivo
+     * es realizar la eliminación de la tarea indicada.
+     *
+     * @param id identificador de la tarea que se desea eliminar
+     */
+    void eliminar(Long id);
 }

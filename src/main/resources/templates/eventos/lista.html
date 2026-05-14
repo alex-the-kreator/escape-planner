@@ -1,137 +1,69 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-
-<!--
-    Vista principal del módulo de eventos.
-    Esta página muestra el listado general de eventos registrados en el sistema.
--->
-
 <head th:replace="~{fragments/layout :: head('Eventos')}"></head>
-
 <body class="app-page">
-
-<!-- Navbar reutilizable cargado desde el fragmento layout -->
 <nav th:replace="~{fragments/layout :: navbar('eventos')}"></nav>
-
 <main class="container py-5">
-
-    <!-- Encabezado principal de la página -->
     <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
-
         <div>
-            <p class="section-kicker">Módulo web</p>
-
-            <!-- Título principal -->
+            <p class="section-kicker">Modulo web</p>
             <h1 class="h2 mb-1">Eventos</h1>
-
-            <!-- Descripción corta del módulo -->
-            <p class="text-muted mb-0">
-                Listado de eventos.
-            </p>
+            <p class="text-muted mb-0">Listado de eventos.</p>
         </div>
-
-        <!-- Botón para registrar un nuevo evento -->
-        <a class="btn btn-primary" th:href="@{/eventos/nuevo}">
-            Nuevo evento
-        </a>
+        <a class="btn btn-primary" th:href="@{/eventos/nuevo}">Nuevo evento</a>
     </div>
 
-    <!-- Mensaje de éxito cuando se registra o actualiza un evento -->
-    <div th:if="${successMessage}"
-         class="alert alert-success"
-         th:text="${successMessage}">
-    </div>
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
 
-    <!-- Card principal que contiene la tabla -->
     <div class="card border-0 shadow-sm">
-
-        <!-- Hace que la tabla sea responsive en pantallas pequeñas -->
         <div class="table-responsive">
-
             <table class="table table-hover align-middle mb-0">
-
-                <!-- Encabezado de la tabla -->
                 <thead class="table-light">
                 <tr>
                     <th>ID</th>
                     <th>Cliente</th>
                     <th>Responsable</th>
                     <th>Tipo</th>
+                    <th>Sede</th>
                     <th>Fecha</th>
                     <th>Horario</th>
                     <th>Personas</th>
                     <th>Estado</th>
+                    <th>Acciones</th>
                 </tr>
                 </thead>
-
                 <tbody>
-
-                <!--
-                    Este registro aparece únicamente cuando
-                    la lista de eventos está vacía.
-                -->
                 <tr th:if="${#lists.isEmpty(eventos)}">
-
-                    <td colspan="8" class="text-center text-muted py-4">
-                        Aún no hay eventos registrados.
-                    </td>
-
+                    <td colspan="10" class="text-center text-muted py-4">Aun no hay eventos registrados.</td>
                 </tr>
-
-                <!--
-                    Recorrido dinámico de la lista de eventos.
-                    Thymeleaf itera cada objeto evento.
-                -->
                 <tr th:each="evento : ${eventos}">
-
-                    <!-- ID del evento -->
                     <td th:text="${evento.id}"></td>
-
-                    <!-- Nombre del cliente relacionado -->
                     <td th:text="${evento.cliente.nombre}"></td>
-
-                    <!-- Usuario responsable del evento -->
                     <td th:text="${evento.usuario.nombre}"></td>
-
-                    <!-- Tipo de evento -->
                     <td th:text="${evento.tipo}"></td>
-
-                    <!-- Fecha del evento -->
+                    <td th:text="${evento.sede != null ? evento.sede.nombreVisible : 'Sin sede'}"></td>
                     <td th:text="${evento.fecha}"></td>
-
-                    <!--
-                        Se muestran la hora de inicio y fin
-                        dentro de la misma columna.
-                    -->
                     <td>
                         <span th:text="${evento.horaInicio}"></span>
-
                         <span>-</span>
-
                         <span th:text="${evento.horaFin}"></span>
                     </td>
-
-                    <!-- Cantidad de personas que asistirán -->
                     <td th:text="${evento.numPersonas}"></td>
-
-                    <!-- Estado actual del evento -->
+                    <td><span class="badge text-bg-warning" th:text="${evento.estado}"></span></td>
                     <td>
-
-                        <!-- Badge de Bootstrap para destacar visualmente el estado, estética -->
-                        <span class="badge text-bg-warning"
-                              th:text="${evento.estado}">
-                        </span>
-
+                        <div class="d-flex gap-2">
+                            <a class="btn btn-sm btn-outline-primary" th:href="@{/eventos/{id}/editar(id=${evento.id})}">Editar</a>
+                            <form th:action="@{/eventos/{id}/eliminar(id=${evento.id})}" method="post" class="m-0">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
+                            </form>
+                        </div>
                     </td>
-
                 </tr>
-
                 </tbody>
             </table>
         </div>
     </div>
-
 </main>
-
 </body>
 </html>

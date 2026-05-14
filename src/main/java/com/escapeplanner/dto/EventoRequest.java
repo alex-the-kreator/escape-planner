@@ -1,6 +1,7 @@
 package com.escapeplanner.dto;
 
 import com.escapeplanner.domain.enums.EstadoEvento;
+import com.escapeplanner.domain.enums.SedeEvento; //Petición para sedes eventos
 import com.escapeplanner.domain.enums.TipoEvento;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -22,6 +23,7 @@ public record EventoRequest(
         @NotNull LocalDate fecha,
         @NotNull LocalTime horaInicio,
         @NotNull LocalTime horaFin,
+        @NotNull SedeEvento sede, //Implementación de sede
         @NotNull @Positive Integer numPersonas,
         @NotNull EstadoEvento estado,
         @NotNull Boolean requiereBloqueo,
